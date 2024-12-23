@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 const axios = require("axios");
+const cors = require("cors");
+
 const helper = require("./utils/helper");
 
 const app = express();
@@ -16,9 +18,16 @@ const appLimiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 
+// CORS
+const corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+};
+
 // Middleware
 app.use(express.json()); // for parsing application/json
 app.use(appLimiter); // apply to all requests
+app.use(cors(corsOptions)); // CORS
 
 // Routes
 app.post("/api/convert", async (req, res, next) => {
@@ -30,7 +39,20 @@ app.post("/api/convert", async (req, res, next) => {
     const response = await axios.get(url);
 
     if (response.data && response.data.result === "success") {
-      helper.resMsg(res, "Currency Convert", [response.data]);
+      helper.resMsg(res, "Currency Convert", response.data);
+    }
+  } catch (error) {
+    next(new Error(error.message));
+  }
+});
+
+app.get("/api/codes", async (req, res, next) => {
+  try {
+    const url = `${API_URL}/${API_KEY}/codes`;
+    const response = await axios.get(url);
+
+    if (response.data && response.data.result === "success") {
+      helper.resMsg(res, "Supported Currency Codes", response.data);
     }
   } catch (error) {
     next(new Error(error.message));
