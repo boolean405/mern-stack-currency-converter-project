@@ -16,7 +16,8 @@ const App = () => {
 
   const fetchCodes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/codes");
+      const url = `${import.meta.env.VITE_BACKEND_API_URL}/api/codes`;
+      const response = await axios.get(url);
       setCodes(response?.data.results.supported_codes);
       setError("");
     } catch (error) {
@@ -44,10 +45,13 @@ const App = () => {
 
     // Http request
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/convert",
-        formData
-      );
+      const url = `${import.meta.env.VITE_BACKEND_API_URL}/api/convert`;
+      const newFormData = {
+        from: formData.from.split(",")[0],
+        to: formData.to.split(",")[0],
+        amount: formData.amount,
+      };
+      const response = await axios.post(url, newFormData);
       setResult(response?.data);
       setError("");
     } catch (error) {
@@ -83,9 +87,9 @@ const App = () => {
             <option value="" disabled>
               Choose Currency
             </option>
-            {codes.map((code, index) => (
-              <option key={index} value={code[0]}>
-                {code[0]} - {code[1]}
+            {codes.map((code) => (
+              <option key={code} value={code}>
+                {code[0]} - {code}
               </option>
             ))}
           </select>
@@ -102,9 +106,9 @@ const App = () => {
             <option value="" disabled>
               Choose Currency
             </option>
-            {codes.map((code, index) => (
-              <option key={index} value={code[0]}>
-                {code[0]} - {code[1]}
+            {codes.map((code) => (
+              <option key={code} value={code}>
+                {code[0]} - {code}
               </option>
             ))}
           </select>
@@ -117,8 +121,8 @@ const App = () => {
       {result && (
         <div className="result">
           <p>
-            Converted Amount: {result.results.conversion_result}{" "}
-            {result.results.target_code}
+            Converted Amount: {formData.amount} {result.results.base_code} ={" "}
+            {result.results.conversion_result} {result.results.target_code}
           </p>
           <p>
             Coversion Rate: 1 {result.results.base_code} ={" "}
