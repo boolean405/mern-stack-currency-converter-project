@@ -121,7 +121,7 @@ const App = () => {
       {result && (
         <div className="result">
           <p>
-            Converted Amount: {formData.amount} {result.results.base_code} ={" "}
+            Converted Amount: 
             {result.results.conversion_result} {result.results.target_code}
           </p>
           <p>
